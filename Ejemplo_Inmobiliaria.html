@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Cita Inmobiliaria</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .calendario {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .dia {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .dia.disponible {
+            background-color: #e0f7fa;
+        }
+        .formulario {
+            margin-top: 20px;
+        }
+        .formulario label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .formulario input, .formulario select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        #confirmacion {
+            margin-top: 20px;
+            border: 1px solid #4caf50;
+            padding: 10px;
+            background-color: #e8f5e9;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agendar Cita Inmobiliaria</h1>
+    <div id="calendario" class="calendario"></div>
+    <div id="formulario" class="formulario">
+        <h2>Detalles de la Cita</h2>
+        <label for="tipoCita">Tipo de Cita:</label>
+        <select id="tipoCita">
+            <option value="visita">Visita a Propiedad</option>
+            <option value="asesoria">Asesoría Inmobiliaria</option>
+        </select>
+        <label for="hora">Hora:</label>
+        <select id="hora"></select>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre">
+        <label for="email">Email:</label>
+        <input type="email" id="email">
+        <button onclick="confirmarCita()">Confirmar Cita</button>
+    </div>
+    <div id="confirmacion"></div>
+
+    <script>
+        const calendarioDiv = document.getElementById('calendario');
+        const horaSelect = document.getElementById('hora');
+        const confirmacionDiv = document.getElementById('confirmacion');
+        let fechaSeleccionada;
+
+        function generarCalendario() {
+            const hoy = new Date();
+            const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+            const ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+            const primerDiaSemana = primerDiaMes.getDay();
+            const diasMes = ultimoDiaMes.getDate();
+            const nombresDias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+            // Crear encabezado de días de la semana
+            for (let dia of nombresDias) {
+                const diaDiv = document.createElement('div');
+                diaDiv.textContent = dia;
+                calendarioDiv.appendChild(diaDiv);
+            }
+
+            // Espacios vacíos antes del primer día
+            for (let i = 0; i < primerDiaSemana; i++) {
+                calendarioDiv.appendChild(document.createElement('div'));
+            }
+
+            // Crear días del mes
+            for (let i = 1; i <= diasMes; i++) {
+                const diaDiv = document.createElement('div');
+                diaDiv.textContent = i;
+                diaDiv.classList.add('dia');
+                if (i % 2 === 0) { // Ejemplo: días pares disponibles
+                    diaDiv.classList.add('disponible');
+                    diaDiv.onclick = () => seleccionarFecha(hoy.getFullYear(), hoy.getMonth(), i);
+                }
+                calendarioDiv.appendChild(diaDiv);
+            }
+        }
+
+        function seleccionarFecha(anio, mes, dia) {
+            fechaSeleccionada = new Date(anio, mes, dia);
+            generarHorasDisponibles();
+        }
+
+        function generarHorasDisponibles() {
+            horaSelect.innerHTML = '';
+            const horas = ['10:00', '11:00', '12:00', '15:00', '16:00', '17:00']; // Ejemplo de horas
+            for (let hora of horas) {
+                const opcion = document.createElement('option');
+                opcion.value = hora;
+                opcion.textContent = hora;
+                horaSelect.appendChild(opcion);
+            }
+        }
+
+        function confirmarCita() {
+            const tipoCita = document.getElementById('tipoCita').value;
+            const hora = document.getElementById('hora').value;
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+
+            const mensaje = `Cita confirmada:\nFecha: ${fechaSeleccionada.toLocaleDateString()}\nHora: ${hora}\nTipo: ${tipoCita}\nNombre: ${nombre}\nEmail: ${email}`;
+            confirmacionDiv.textContent = mensaje;
+            confirmacionDiv.style.display = 'block';
+        }
+
+        generarCalendario();
+    </script>
+</body>
+</html>
